@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Command mkcert is a simple zero-config tool to make development certificates.
-package main
+package truststore
 
 import (
 	"crypto"

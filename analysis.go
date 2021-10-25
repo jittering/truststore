@@ -2,9 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build analysis
 // +build analysis
 
-package main
+package truststore
 
 import (
 	"golang.org/x/tools/go/analysis"

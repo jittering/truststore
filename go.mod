@@ -1,4 +1,4 @@
-module filippo.io/mkcert
+module github.com/jittering/truststore
 
 go 1.13
 
