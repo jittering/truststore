@@ -49,7 +49,7 @@ func init() {
 
 func (m *mkcert) makeCert(hosts []string) {
 	if m.caKey == nil {
-		log.Fatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
+		logFatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
 	}
 
 	priv, err := m.generateKey(false)
@@ -208,18 +208,18 @@ func randomSerialNumber() *big.Int {
 
 func (m *mkcert) makeCertFromCSR() {
 	if m.caKey == nil {
-		log.Fatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
+		logFatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
 	}
 
 	csrPEMBytes, err := ioutil.ReadFile(m.csrPath)
 	fatalIfErr(err, "failed to read the CSR")
 	csrPEM, _ := pem.Decode(csrPEMBytes)
 	if csrPEM == nil {
-		log.Fatalln("ERROR: failed to read the CSR: unexpected content")
+		logFatalln("ERROR: failed to read the CSR: unexpected content")
 	}
 	if csrPEM.Type != "CERTIFICATE REQUEST" &&
 		csrPEM.Type != "NEW CERTIFICATE REQUEST" {
-		log.Fatalln("ERROR: failed to read the CSR: expected CERTIFICATE REQUEST, got " + csrPEM.Type)
+		logFatalln("ERROR: failed to read the CSR: expected CERTIFICATE REQUEST, got " + csrPEM.Type)
 	}
 	csr, err := x509.ParseCertificateRequest(csrPEM.Bytes)
 	fatalIfErr(err, "failed to parse the CSR")
@@ -286,7 +286,7 @@ func (m *mkcert) loadCA() {
 	fatalIfErr(err, "failed to read the CA certificate")
 	certDERBlock, _ := pem.Decode(certPEMBlock)
 	if certDERBlock == nil || certDERBlock.Type != "CERTIFICATE" {
-		log.Fatalln("ERROR: failed to read the CA certificate: unexpected content")
+		logFatalln("ERROR: failed to read the CA certificate: unexpected content")
 	}
 	m.caCert, err = x509.ParseCertificate(certDERBlock.Bytes)
 	fatalIfErr(err, "failed to parse the CA certificate")
@@ -299,7 +299,7 @@ func (m *mkcert) loadCA() {
 	fatalIfErr(err, "failed to read the CA key")
 	keyDERBlock, _ := pem.Decode(keyPEMBlock)
 	if keyDERBlock == nil || keyDERBlock.Type != "PRIVATE KEY" {
-		log.Fatalln("ERROR: failed to read the CA key: unexpected content")
+		logFatalln("ERROR: failed to read the CA key: unexpected content")
 	}
 	m.caKey, err = x509.ParsePKCS8PrivateKey(keyDERBlock.Bytes)
 	fatalIfErr(err, "failed to parse the CA key")
