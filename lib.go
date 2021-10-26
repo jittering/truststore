@@ -17,6 +17,11 @@ type MkcertLib struct {
 	m *mkcert
 }
 
+type Cert struct {
+	CertFile string
+	KeyFile  string
+}
+
 // GetCAROOT returns the computed CAROOT path. See `getCAROOT` for search order.
 func GetCAROOT() string {
 	return getCAROOT()
@@ -47,15 +52,22 @@ func NewLib() (mlib *MkcertLib, err error) {
 //
 // *NOTE* A single cert will be created which is valid for all given hosts. To
 //        create multiple files, call this method once per host.
-func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (err error) {
+func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (cert Cert, err error) {
 	err = validateHosts(hosts)
 	if err != nil {
 		return
 	}
 
-	return trap(func() {
+	err = trap(func() {
 		ml.m.makeCert(hosts, targetOutputPath)
 	})
+	if err != nil {
+		return Cert{}, err
+	}
+
+	certFile, keyFile, _ := ml.m.fileNames(hosts, targetOutputPath)
+	cert = Cert{certFile, keyFile}
+	return
 }
 
 // validateHosts method extracted from cli program's `run` method.

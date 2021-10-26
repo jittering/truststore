@@ -45,7 +45,7 @@ func TestNew(t *testing.T) {
 func TestMakeCertDontPanic(t *testing.T) {
 	ml := MkcertLib{m: &mkcert{}}
 
-	err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
+	_, err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
 	t.Logf("got error: %v\n", err)
 	if err == nil {
 		t.Errorf("expected an error, got nil")
@@ -61,24 +61,32 @@ func TestMakeCertDontPanic(t *testing.T) {
 func TestMakeCert(t *testing.T) {
 	ml, _ := NewLib()
 
-	err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
+	cert, err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
 	t.Logf("got error: %v\n", err)
 	if err != nil {
 		t.Errorf("got unexpected error: %v", err)
 		t.FailNow()
 	}
 
-	_, err = os.Stat(filepath.Join(tempDir, "foo.baz.com.pem"))
-	if err != nil {
-		t.Errorf("got unexpected error: %v", err)
-		t.FailNow()
+	// ensure files were generated and the output is as expected
+	files := []string{
+		filepath.Join(tempDir, "foo.baz.com.pem"),
+		filepath.Join(tempDir, "foo.baz.com-key.pem"),
+		cert.CertFile,
+		cert.KeyFile,
 	}
 
-	_, err = os.Stat(filepath.Join(tempDir, "foo.baz.com-key.pem"))
-	if err != nil {
-		t.Errorf("got unexpected error: %v", err)
-		t.FailNow()
+	if files[0] != cert.CertFile {
+		t.Errorf("CertFile path = %v, wanted %v", cert.CertFile, files[0])
 	}
+
+	for _, f := range files {
+		_, err = os.Stat(f)
+		if err != nil {
+			t.Errorf("got unexpected error: %v", err)
+		}
+	}
+
 }
 
 // don't really have a good test case of an invalid string here
