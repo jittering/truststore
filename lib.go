@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/mail"
 	"net/url"
+	"os"
 	"regexp"
 
 	"golang.org/x/net/idna"
@@ -28,6 +29,14 @@ type MkcertLib struct {
 type Cert struct {
 	CertFile string
 	KeyFile  string
+}
+
+// Exists returns true if both the CertFile and KeyFile exist
+func (c Cert) Exists() bool {
+	if c.CertFile == "" || c.KeyFile == "" {
+		return false
+	}
+	return exists(c.CertFile) && exists(c.KeyFile)
 }
 
 // GetCAROOT returns the computed CAROOT path. See `getCAROOT` for search order.
@@ -169,4 +178,10 @@ func logPrintln(v ...interface{}) {
 		log.Println(v...)
 	}
 
+}
+
+// exists tests the existence of the given file
+func exists(file string) bool {
+	_, err := os.Stat(file)
+	return err == nil
 }
