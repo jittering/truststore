@@ -16,7 +16,6 @@ import (
 	"encoding/asn1"
 	"encoding/pem"
 	"io/ioutil"
-	"log"
 	"math/big"
 	"net"
 	"net/mail"
@@ -133,31 +132,31 @@ func (m *mkcert) makeCert(hosts []string, targetOutputPath string) {
 
 	if !m.pkcs12 {
 		if certFile == keyFile {
-			log.Printf("\nThe certificate and key are at \"%s\" ✅\n\n", certFile)
+			logPrintf("\nThe certificate and key are at \"%s\" ✅\n\n", certFile)
 		} else {
-			log.Printf("\nThe certificate is at \"%s\" and the key at \"%s\" ✅\n\n", certFile, keyFile)
+			logPrintf("\nThe certificate is at \"%s\" and the key at \"%s\" ✅\n\n", certFile, keyFile)
 		}
 	} else {
-		log.Printf("\nThe PKCS#12 bundle is at \"%s\" ✅\n", p12File)
-		log.Printf("\nThe legacy PKCS#12 encryption password is the often hardcoded default \"changeit\" ℹ️\n\n")
+		logPrintf("\nThe PKCS#12 bundle is at \"%s\" ✅\n", p12File)
+		logPrintf("\nThe legacy PKCS#12 encryption password is the often hardcoded default \"changeit\" ℹ️\n\n")
 	}
 
-	log.Printf("It will expire on %s 🗓\n\n", expiration.Format("2 January 2006"))
+	logPrintf("It will expire on %s 🗓\n\n", expiration.Format("2 January 2006"))
 }
 
 func (m *mkcert) printHosts(hosts []string) {
 	secondLvlWildcardRegexp := regexp.MustCompile(`(?i)^\*\.[0-9a-z_-]+$`)
-	log.Printf("\nCreated a new certificate valid for the following names 📜")
+	logPrintf("\nCreated a new certificate valid for the following names 📜")
 	for _, h := range hosts {
-		log.Printf(" - %q", h)
+		logPrintf(" - %q", h)
 		if secondLvlWildcardRegexp.MatchString(h) {
-			log.Printf("   Warning: many browsers don't support second-level wildcards like %q ⚠️", h)
+			logPrintf("   Warning: many browsers don't support second-level wildcards like %q ⚠️", h)
 		}
 	}
 
 	for _, h := range hosts {
 		if strings.HasPrefix(h, "*.") {
-			log.Printf("\nReminder: X.509 wildcards only go one level deep, so this won't match a.b.%s ℹ️", h[2:])
+			logPrintf("\nReminder: X.509 wildcards only go one level deep, so this won't match a.b.%s ℹ️", h[2:])
 			break
 		}
 	}
@@ -273,9 +272,9 @@ func (m *mkcert) makeCertFromCSR() {
 
 	m.printHosts(hosts)
 
-	log.Printf("\nThe certificate is at \"%s\" ✅\n\n", certFile)
+	logPrintf("\nThe certificate is at \"%s\" ✅\n\n", certFile)
 
-	log.Printf("It will expire on %s 🗓\n\n", expiration.Format("2 January 2006"))
+	logPrintf("It will expire on %s 🗓\n\n", expiration.Format("2 January 2006"))
 }
 
 // loadCA will load or create the CA at CAROOT.
@@ -360,7 +359,7 @@ func (m *mkcert) newCA() {
 		&pem.Block{Type: "CERTIFICATE", Bytes: cert}), 0644)
 	fatalIfErr(err, "failed to save CA certificate")
 
-	log.Printf("Created a new local CA 💥\n")
+	logPrintf("Created a new local CA 💥\n")
 }
 
 func (m *mkcert) caUniqueName() string {

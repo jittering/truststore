@@ -6,7 +6,6 @@ package truststore
 
 import (
 	"bytes"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -92,12 +91,12 @@ func (m *mkcert) installNSS() bool {
 		out, err := execCertutil(cmd)
 		fatalIfCmdErr(err, "certutil -A -d "+profile, out)
 	}) == 0 {
-		log.Printf("ERROR: no %s security databases found", NSSBrowsers)
+		logPrintf("ERROR: no %s security databases found", NSSBrowsers)
 		return false
 	}
 	if !m.checkNSS() {
-		log.Printf("Installing in %s failed. Please report the issue with details about your environment at https://github.com/FiloSottile/mkcert/issues/new 👎", NSSBrowsers)
-		log.Printf("Note that if you never started %s, you need to do that at least once.", NSSBrowsers)
+		logPrintf("Installing in %s failed. Please report the issue with details about your environment at https://github.com/FiloSottile/mkcert/issues/new 👎", NSSBrowsers)
+		logPrintf("Note that if you never started %s, you need to do that at least once.", NSSBrowsers)
 		return false
 	}
 	return true

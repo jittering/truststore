@@ -54,8 +54,8 @@ func (m *mkcert) systemTrustFilename() string {
 
 func (m *mkcert) installPlatform() bool {
 	if SystemTrustCommand == nil {
-		log.Printf("Installing to the system store is not yet supported on this Linux 😣 but %s will still work.", NSSBrowsers)
-		log.Printf("You can also manually install the root certificate at %q.", filepath.Join(m.CAROOT, rootName))
+		logPrintf("Installing to the system store is not yet supported on this Linux 😣 but %s will still work.", NSSBrowsers)
+		logPrintf("You can also manually install the root certificate at %q.", filepath.Join(m.CAROOT, rootName))
 		return false
 	}
 
