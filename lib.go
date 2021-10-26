@@ -65,6 +65,18 @@ func NewLib() (mlib *MkcertLib, err error) {
 	return ml, nil
 }
 
+// CertFile generates the output filenames for the given host(s)
+func (ml *MkcertLib) CertFile(hosts []string, targetOutputPath string) (cert Cert, err error) {
+	err = validateHosts(hosts)
+	if err != nil {
+		return Cert{}, err
+	}
+
+	certFile, keyFile, _ := ml.m.fileNames(hosts, targetOutputPath)
+	cert = Cert{certFile, keyFile}
+	return cert, nil
+}
+
 // MakeCert with the given host names.
 //
 // All names must be valid hostnames or IP addresses. See `validateHosts`.
@@ -72,7 +84,7 @@ func NewLib() (mlib *MkcertLib, err error) {
 // *NOTE* A single cert will be created which is valid for all given hosts. To
 //        create multiple files, call this method once per host.
 func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (cert Cert, err error) {
-	err = validateHosts(hosts)
+	cert, err = ml.CertFile(hosts, targetOutputPath)
 	if err != nil {
 		return
 	}
@@ -84,8 +96,6 @@ func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (cert Cer
 		return Cert{}, err
 	}
 
-	certFile, keyFile, _ := ml.m.fileNames(hosts, targetOutputPath)
-	cert = Cert{certFile, keyFile}
 	return
 }
 
