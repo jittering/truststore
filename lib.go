@@ -41,9 +41,12 @@ func NewLib() (mlib *MkcertLib, err error) {
 	return ml, nil
 }
 
-// MakeCert for the given host names
+// MakeCert with the given host names.
 //
-// All names must be valid hostnames.
+// All names must be valid hostnames or IP addresses. See `validateHosts`.
+//
+// *NOTE* A single cert will be created which is valid for all given hosts. To
+//        create multiple files, call this method once per host.
 func (ml *MkcertLib) MakeCert(hosts []string) (err error) {
 	err = validateHosts(hosts)
 	if err != nil {
