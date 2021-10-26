@@ -3,6 +3,7 @@ package truststore
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/mail"
 	"net/url"
@@ -12,6 +13,13 @@ import (
 )
 
 var hostnameRegexp = regexp.MustCompile(`(?i)^(\*\.)?[0-9a-z_-]([0-9a-z._-]*[0-9a-z_-])?$`)
+
+// Print controls whether or not log messages should be printed.
+//
+// As `mkcert` is originally a cli-based tool, there are verbose print
+// statements littered throughout. For library usage, we want to silence them
+// by default, but it may be useful to re-enable under some conditions.
+var Print = false
 
 type MkcertLib struct {
 	m *mkcert
@@ -121,4 +129,23 @@ func trap(f func()) (err error) {
 // exiting, raise a panic which we can catch with `trap` above.
 func logFatalln(v ...interface{}) {
 	panic(errors.New(fmt.Sprintln(v...)))
+}
+
+func logPrint(v ...interface{}) {
+	if Print {
+		log.Print(v...)
+	}
+}
+
+func logPrintf(format string, v ...interface{}) {
+	if Print {
+		log.Printf(format, v...)
+	}
+}
+
+func logPrintln(v ...interface{}) {
+	if Print {
+		log.Println(v...)
+	}
+
 }
