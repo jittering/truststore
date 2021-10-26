@@ -128,25 +128,25 @@ func main() {
 	}
 	if *carootFlag {
 		if *installFlag || *uninstallFlag {
-			log.Fatalln("ERROR: you can't set -[un]install and -CAROOT at the same time")
+			logFatalln("ERROR: you can't set -[un]install and -CAROOT at the same time")
 		}
 		fmt.Println(getCAROOT())
 		return
 	}
 	if *installFlag && *uninstallFlag {
-		log.Fatalln("ERROR: you can't set -install and -uninstall at the same time")
+		logFatalln("ERROR: you can't set -install and -uninstall at the same time")
 	}
 	if *csrFlag != "" && (*pkcs12Flag || *ecdsaFlag || *clientFlag) {
-		log.Fatalln("ERROR: can only combine -csr with -install and -cert-file")
+		logFatalln("ERROR: can only combine -csr with -install and -cert-file")
 	}
 	if *csrFlag != "" && flag.NArg() != 0 {
-		log.Fatalln("ERROR: can't specify extra arguments when using -csr")
+		logFatalln("ERROR: can't specify extra arguments when using -csr")
 	}
 	(&mkcert{
 		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
 		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
 		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
-	}).Run(flag.Args())
+	}).run(flag.Args())
 }
 
 const rootName = "rootCA.pem"
@@ -168,10 +168,10 @@ type mkcert struct {
 	ignoreCheckFailure bool
 }
 
-func (m *mkcert) Run(args []string) {
+func (m *mkcert) run(args []string) {
 	m.CAROOT = getCAROOT()
 	if m.CAROOT == "" {
-		log.Fatalln("ERROR: failed to find the default CA location, set one as the CAROOT env var")
+		logFatalln("ERROR: failed to find the default CA location, set one as the CAROOT env var")
 	}
 	fatalIfErr(os.MkdirAll(m.CAROOT, 0755), "failed to create the CAROOT")
 	m.loadCA()
@@ -357,13 +357,13 @@ func storeEnabled(name string) bool {
 
 func fatalIfErr(err error, msg string) {
 	if err != nil {
-		log.Fatalf("ERROR: %s: %s", msg, err)
+		panic(fmt.Sprintf("ERROR: %s: %s", msg, err))
 	}
 }
 
 func fatalIfCmdErr(err error, cmd string, out []byte) {
 	if err != nil {
-		log.Fatalf("ERROR: failed to execute \"%s\": %s\n\n%s\n", cmd, err, out)
+		panic(fmt.Sprintf("ERROR: failed to execute \"%s\": %s\n\n%s\n", cmd, err, out))
 	}
 }
 
