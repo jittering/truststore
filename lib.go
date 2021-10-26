@@ -37,6 +37,17 @@ func GetCAROOT() string {
 
 // NewLib initializes a new instance of MkcertLib. It will automatically
 // initialize a new CA, as needed.
+//
+// Since output is silenced by default, in order to troubleshoot errors while
+// creating a new CA or loading an existing one, it may be useful to run twice
+// if an error is returned, like so:
+//
+// ml, err := truststore.NewLib()
+// if err != nil {
+// 	truststore.Print = true
+// 	truststore.NewLib()
+// 	// handle err...
+// }
 func NewLib() (mlib *MkcertLib, err error) {
 	ml := &MkcertLib{
 		m: &mkcert{
