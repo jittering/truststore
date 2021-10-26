@@ -3,9 +3,12 @@ package truststore
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+var tempDir string
 
 func TestMain(m *testing.M) {
 	dir, err := os.MkdirTemp(os.TempDir(), "truststore-test-")
@@ -13,6 +16,7 @@ func TestMain(m *testing.M) {
 		panic(fmt.Errorf("failed to create temp dir: %v", err))
 	}
 	os.Setenv("CAROOT", dir)
+	tempDir = dir + string(filepath.Separator)
 	ret := m.Run()
 
 	err = os.RemoveAll(dir)
@@ -41,7 +45,7 @@ func TestNew(t *testing.T) {
 func TestMakeCertDontPanic(t *testing.T) {
 	ml := MkcertLib{m: &mkcert{}}
 
-	err := ml.MakeCert([]string{"foo.baz.com"})
+	err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
 	t.Logf("got error: %v\n", err)
 	if err == nil {
 		t.Errorf("expected an error, got nil")
@@ -49,6 +53,29 @@ func TestMakeCertDontPanic(t *testing.T) {
 	}
 
 	if !strings.Contains(err.Error(), "can't create new certificates") {
+		t.Errorf("got unexpected error: %v", err)
+		t.FailNow()
+	}
+}
+
+func TestMakeCert(t *testing.T) {
+	ml, _ := NewLib()
+
+	err := ml.MakeCert([]string{"foo.baz.com"}, tempDir)
+	t.Logf("got error: %v\n", err)
+	if err != nil {
+		t.Errorf("got unexpected error: %v", err)
+		t.FailNow()
+	}
+
+	_, err = os.Stat(filepath.Join(tempDir, "foo.baz.com.pem"))
+	if err != nil {
+		t.Errorf("got unexpected error: %v", err)
+		t.FailNow()
+	}
+
+	_, err = os.Stat(filepath.Join(tempDir, "foo.baz.com-key.pem"))
+	if err != nil {
 		t.Errorf("got unexpected error: %v", err)
 		t.FailNow()
 	}

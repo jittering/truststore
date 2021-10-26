@@ -47,14 +47,14 @@ func NewLib() (mlib *MkcertLib, err error) {
 //
 // *NOTE* A single cert will be created which is valid for all given hosts. To
 //        create multiple files, call this method once per host.
-func (ml *MkcertLib) MakeCert(hosts []string) (err error) {
+func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (err error) {
 	err = validateHosts(hosts)
 	if err != nil {
 		return
 	}
 
 	return trap(func() {
-		ml.m.makeCert(hosts)
+		ml.m.makeCert(hosts, targetOutputPath)
 	})
 }
 
