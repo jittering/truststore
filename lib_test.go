@@ -53,3 +53,26 @@ func TestMakeCertDontPanic(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+// don't really have a good test case of an invalid string here
+func Test_validateHosts(t *testing.T) {
+	type args struct {
+		hosts []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"valid", args{[]string{"foobar", "foo.local.com"}}, false},
+		{"valid ip", args{[]string{"1.1.1.1"}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validateHosts(tt.args.hosts); (err != nil) != tt.wantErr {
+				t.Logf("hosts: %#v", tt.args.hosts)
+				t.Errorf("validateHosts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
