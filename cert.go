@@ -47,7 +47,7 @@ func init() {
 	}
 }
 
-func (m *mkcert) makeCert(hosts []string) {
+func (m *mkcert) makeCert(hosts []string, targetOutputPath string) {
 	if m.caKey == nil {
 		logFatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
 	}
@@ -104,7 +104,7 @@ func (m *mkcert) makeCert(hosts []string) {
 	cert, err := x509.CreateCertificate(rand.Reader, tpl, m.caCert, pub, m.caKey)
 	fatalIfErr(err, "failed to generate certificate")
 
-	certFile, keyFile, p12File := m.fileNames(hosts)
+	certFile, keyFile, p12File := m.fileNames(hosts, targetOutputPath)
 
 	if !m.pkcs12 {
 		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
@@ -173,7 +173,7 @@ func (m *mkcert) generateKey(rootCA bool) (crypto.PrivateKey, error) {
 	return rsa.GenerateKey(rand.Reader, 2048)
 }
 
-func (m *mkcert) fileNames(hosts []string) (certFile, keyFile, p12File string) {
+func (m *mkcert) fileNames(hosts []string, targetOutputPath string) (certFile, keyFile, p12File string) {
 	defaultName := strings.Replace(hosts[0], ":", "_", -1)
 	defaultName = strings.Replace(defaultName, "*", "_wildcard", -1)
 	if len(hosts) > 1 {
@@ -183,15 +183,15 @@ func (m *mkcert) fileNames(hosts []string) (certFile, keyFile, p12File string) {
 		defaultName += "-client"
 	}
 
-	certFile = "./" + defaultName + ".pem"
+	certFile = targetOutputPath + defaultName + ".pem"
 	if m.certFile != "" {
 		certFile = m.certFile
 	}
-	keyFile = "./" + defaultName + "-key.pem"
+	keyFile = targetOutputPath + defaultName + "-key.pem"
 	if m.keyFile != "" {
 		keyFile = m.keyFile
 	}
-	p12File = "./" + defaultName + ".p12"
+	p12File = targetOutputPath + defaultName + ".p12"
 	if m.p12File != "" {
 		p12File = m.p12File
 	}
@@ -265,7 +265,7 @@ func (m *mkcert) makeCertFromCSR() {
 	for _, uri := range c.URIs {
 		hosts = append(hosts, uri.String())
 	}
-	certFile, _, _ := m.fileNames(hosts)
+	certFile, _, _ := m.fileNames(hosts, "./")
 
 	err = ioutil.WriteFile(certFile, pem.EncodeToMemory(
 		&pem.Block{Type: "CERTIFICATE", Bytes: cert}), 0644)

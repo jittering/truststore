@@ -234,7 +234,7 @@ func (m *mkcert) run(args []string) {
 		}
 	}
 
-	m.makeCert(args)
+	m.makeCert(args, "./")
 }
 
 func getCAROOT() string {
