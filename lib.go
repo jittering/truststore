@@ -45,7 +45,8 @@ func GetCAROOT() string {
 }
 
 // NewLib initializes a new instance of MkcertLib. It will automatically
-// initialize a new CA, as needed.
+// initialize a new CA, as needed, however it will *not* install it in the
+// system.
 //
 // Since output is silenced by default, in order to troubleshoot errors while
 // creating a new CA or loading an existing one, it may be useful to run twice
@@ -105,6 +106,22 @@ func (ml *MkcertLib) MakeCert(hosts []string, targetOutputPath string) (cert Cer
 		return Cert{}, err
 	}
 
+	return
+}
+
+// Install the CA into the system trust stores
+func (ml *MkcertLib) Install() (err error) {
+	err = trap(func() {
+		ml.m.install()
+	})
+	return
+}
+
+// Uninstall the CA from the system trust stores
+func (ml *MkcertLib) Uninstall() (err error) {
+	err = trap(func() {
+		ml.m.uninstall()
+	})
 	return
 }
 
