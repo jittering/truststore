@@ -6,6 +6,7 @@ package truststore
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -21,6 +22,22 @@ var (
 	SystemTrustFilename string
 	SystemTrustCommand  []string
 	CertutilInstallHelp string
+)
+
+var (
+	//go:embed certutil/**
+	embedded      embed.FS
+	certutilDir   string
+	certutilFiles = []string{
+		"certutil/linux64/certutil.gz",
+		"certutil/linux64/libnspr4.so.gz",
+		"certutil/linux64/libnss3.so.gz",
+		"certutil/linux64/libnssutil3.so.gz",
+		"certutil/linux64/libplc4.so.gz",
+		"certutil/linux64/libplds4.so.gz",
+		"certutil/linux64/libsmime3.so.gz",
+		"certutil/linux64/libssl3.so.gz",
+	}
 )
 
 func init() {

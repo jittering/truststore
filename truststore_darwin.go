@@ -6,6 +6,7 @@ package truststore
 
 import (
 	"bytes"
+	"embed"
 	"encoding/asn1"
 	"io/ioutil"
 	"os"
@@ -18,6 +19,17 @@ var (
 	FirefoxProfiles     = []string{os.Getenv("HOME") + "/Library/Application Support/Firefox/Profiles/*"}
 	CertutilInstallHelp = "brew install nss"
 	NSSBrowsers         = "Firefox"
+)
+
+var (
+	//go:embed certutil/**
+	embedded      embed.FS
+	certutilDir   string
+	certutilFiles = []string{
+		"certutil/mac64/certutil.gz",
+		"certutil/mac64/libmozglue.dylib.gz",
+		"certutil/mac64/libnss3.dylib.gz",
+	}
 )
 
 // https://github.com/golang/go/issues/24652#issuecomment-399826583

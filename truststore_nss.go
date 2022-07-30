@@ -177,14 +177,14 @@ func setupCertutil() error {
 			return fmt.Errorf("error setting up certutil: %s", err)
 		}
 		defer gr.Close()
-		out, err := os.OpenFile(path.Join(certutilDir, strings.TrimSuffix(path.Base(filename), ".gz")), os.O_CREATE, 0755)
+		out, err := os.OpenFile(path.Join(certutilDir, strings.TrimSuffix(path.Base(filename), ".gz")), os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
-			return fmt.Errorf("error setting up certutil: %s", err)
+			return fmt.Errorf("error: failed to open file for writing: %s", err)
 		}
 		defer out.Close()
 		_, err = io.Copy(out, gr)
 		if err != nil {
-			return fmt.Errorf("error setting up certutil: %s", err)
+			return fmt.Errorf("error: failed to write certutil binary: %s", err)
 		}
 	}
 

@@ -2,3 +2,12 @@
 .vscode
 
 certutil
+
+truststore-darwin
+truststore-linux
+truststore.exe
+truststore_darwin.go
+truststore_java.go
+truststore_linux.go
+truststore_nss.go
+truststore_windows.go
