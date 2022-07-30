@@ -202,3 +202,9 @@ func exists(file string) bool {
 	_, err := os.Stat(file)
 	return err == nil
 }
+
+// Main exposes the package main method so we can call from our real main
+// in bin/main.go
+func Main() {
+	main()
+}
