@@ -114,6 +114,7 @@ func (ml *MkcertLib) Install() (err error) {
 	err = trap(func() {
 		ml.m.install()
 	})
+	cleanupCertutil()
 	return
 }
 
@@ -122,6 +123,7 @@ func (ml *MkcertLib) Uninstall() (err error) {
 	err = trap(func() {
 		ml.m.uninstall()
 	})
+	cleanupCertutil()
 	return
 }
 
