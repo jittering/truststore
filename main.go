@@ -147,6 +147,7 @@ func main() {
 		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
 		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
 	}).run(flag.Args())
+	cleanupCertutil()
 }
 
 const rootName = "rootCA.pem"

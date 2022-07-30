@@ -6,6 +6,7 @@ package truststore
 
 import (
 	"crypto/x509"
+	"embed"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -17,7 +18,7 @@ import (
 )
 
 var (
-	FirefoxProfiles     = []string{os.Getenv("USERPROFILE") + "\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles"}
+	FirefoxProfiles     = []string{os.Getenv("USERPROFILE") + "\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\*"}
 	CertutilInstallHelp = "" // certutil unsupported on Windows
 	NSSBrowsers         = "Firefox"
 )
@@ -30,6 +31,20 @@ var (
 	procCertDuplicateCertificateContext  = modcrypt32.NewProc("CertDuplicateCertificateContext")
 	procCertEnumCertificatesInStore      = modcrypt32.NewProc("CertEnumCertificatesInStore")
 	procCertOpenSystemStoreW             = modcrypt32.NewProc("CertOpenSystemStoreW")
+)
+
+var (
+	//go:embed certutil/**
+	embedded      embed.FS
+	certutilDir   string
+	certutilFiles = []string{
+		"certutil/win64/certutil.exe.gz",
+		"certutil/win64/freebl3.dll.gz",
+		"certutil/win64/mozglue.dll.gz",
+		"certutil/win64/nss3.dll.gz",
+		"certutil/win64/nssckbi.dll.gz",
+		"certutil/win64/softokn3.dll.gz",
+	}
 )
 
 func (m *mkcert) installPlatform() bool {

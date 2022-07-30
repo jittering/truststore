@@ -6,8 +6,13 @@ package truststore
 
 import (
 	"bytes"
+	"compress/gzip"
+	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"os/signal"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -70,6 +75,11 @@ func init() {
 }
 
 func (m *mkcert) checkNSS() bool {
+	// bundled certutil/nss support
+	err := setupCertutil()
+	if err != nil {
+		logFatalln(err)
+	}
 	if !hasCertutil {
 		return false
 	}
@@ -147,4 +157,63 @@ func (m *mkcert) forEachNSSProfile(f func(profile string)) (found int) {
 		}
 	}
 	return
+}
+
+func setupCertutil() error {
+	certutilDir = path.Join(os.TempDir(), "truststore-certutil")
+	err := os.MkdirAll(certutilDir, 0755)
+	if err != nil {
+		return fmt.Errorf("error setting up certutil: %s", err)
+	}
+	for _, filename := range certutilFiles {
+		// gunzip file and write to temp dir
+		f, err := embedded.Open(filename)
+		if err != nil {
+			return fmt.Errorf("error setting up certutil: %s", err)
+		}
+		defer f.Close()
+		gr, err := gzip.NewReader(f)
+		if err != nil {
+			return fmt.Errorf("error setting up certutil: %s", err)
+		}
+		defer gr.Close()
+		out, err := os.OpenFile(path.Join(certutilDir, strings.TrimSuffix(path.Base(filename), ".gz")), os.O_CREATE, 0755)
+		if err != nil {
+			return fmt.Errorf("error setting up certutil: %s", err)
+		}
+		defer out.Close()
+		_, err = io.Copy(out, gr)
+		if err != nil {
+			return fmt.Errorf("error setting up certutil: %s", err)
+		}
+	}
+
+	// cleanup temp dir if interrupted
+	stop := make(chan os.Signal)
+	signal.Notify(stop, os.Interrupt)
+	go func() {
+		<-stop
+		err = os.RemoveAll(certutilDir)
+		if err != nil {
+			fmt.Printf("failed to remove bundled certutil at %s: %s", certutilDir, err.Error())
+		}
+	}()
+
+	// set flags so nss sees it
+	certutilPath = path.Join(certutilDir, "certutil")
+	hasCertutil = true
+
+	return nil
+}
+
+func cleanupCertutil() error {
+	if certutilDir == "" {
+		return nil
+	}
+	err := os.RemoveAll(certutilDir)
+	if err != nil {
+		return fmt.Errorf("failed to remove bundled certutil at %s: %s", certutilDir, err.Error())
+	}
+	return nil
+
 }
