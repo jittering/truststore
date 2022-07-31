@@ -160,6 +160,11 @@ func (m *mkcert) forEachNSSProfile(f func(profile string)) (found int) {
 }
 
 func setupCertutil() error {
+	if hasCertutil && certutilPath != "" {
+		// use system bin if avail
+		return nil
+	}
+
 	certutilDir = path.Join(os.TempDir(), "truststore-certutil")
 	err := os.MkdirAll(certutilDir, 0755)
 	if err != nil {
