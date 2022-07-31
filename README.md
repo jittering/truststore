@@ -16,7 +16,7 @@ truststore supports the following root stores:
   * `update-ca-trust` (Fedora, RHEL, CentOS) or
   * `update-ca-certificates` (Ubuntu, Debian, OpenSUSE, SLES) or
   * `trust` (Arch)
-* Firefox (macOS and Linux only)
+* Firefox
 * Chrome and Chromium
 * Java (when `JAVA_HOME` is set)
 
